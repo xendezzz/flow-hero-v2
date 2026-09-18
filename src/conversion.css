@@ -1,5 +1,8 @@
 /* Conversion pass: Wispr-inspired typography scale, faster comprehension and proof. */
 :root{--flow-serif:"Hedvig Letters Serif",Georgia,serif;--flow-sans:"Satoshi",Arial,sans-serif;--flow-max:1160px}
+/* Preserve the cursor trail and motion effects while letting macOS and the
+   browser render their familiar native pointer for every element. */
+html,body,body *{cursor:revert!important}
 .flow-eyebrow,.flow-section-label{display:block;margin-bottom:22px;font:700 12px/1 var(--flow-sans);letter-spacing:.12em;text-transform:uppercase;color:#5d5d5d}
 .fb-hero{min-height:780px;padding:82px 24px 76px}
 .fb-hero h1{font-size:clamp(68px,7.5vw,96px);line-height:.95;letter-spacing:-.03em;gap:.08em}
