@@ -1,31 +1,29 @@
 function RunableNavbar(){
  const [open,setOpen]=M.useState(false);
- const sections=["Capabilities","Solutions","Resources"];
+ const menu=M.useRef(null);
+ const links=[["How it works","#dictation-demo"],["Apps","#your-apps"],["Why Flow","#why-flow"],["Free","#free"],["FAQ","#faq"]];
+ M.useEffect(()=>{
+  if(!open)return;
+  const previous=document.body.style.overflow;document.body.style.overflow='hidden';
+  const key=event=>{if(event.key==='Escape')setOpen(false)};document.addEventListener('keydown',key);
+  window.setTimeout(()=>menu.current?.querySelector('a')?.focus(),20);
+  return()=>{document.body.style.overflow=previous;document.removeEventListener('keydown',key)};
+ },[open]);
  return o.jsxs("header",{className:"site-header runable-header",children:[
   o.jsxs("div",{className:"header-inner runable-nav",children:[
    o.jsx("a",{href:"https://runable.com",className:"brand-home runable-mark","aria-label":"Runable home",children:o.jsx(Bo,{size:"lg",hideLabel:!0})}),
-   o.jsxs("nav",{"aria-label":"Main navigation",className:"desktop-navigation runable-links",children:[
-    sections.map(label=>o.jsxs("details",{className:"header-dropdown",name:"header-navigation",children:[
-     o.jsxs("summary",{children:[label,o.jsx(q1,{size:13,"aria-hidden":"true"})]}),
-     o.jsx("div",{className:"header-dropdown-links",children:ch.find(item=>item.title===label)?.links.map(([text,href])=>o.jsx("a",{href:href.startsWith("https")?href:`https://runable.com${href}`,children:text},href))})
-    ]},label)),
-    o.jsx("a",{className:"nav-pill",href:"https://runable.com/community",children:"Community"}),
-    o.jsx("a",{className:"nav-pill",href:$e.pricing,children:"Pricing"})
-   ]}),
+   o.jsx("nav",{"aria-label":"Main navigation",className:"desktop-navigation runable-links",children:links.map(([label,href])=>o.jsx("a",{className:"nav-pill",href,children:label},label))}),
    o.jsxs("div",{className:"header-actions",children:[
     o.jsx("a",{className:"login-link nav-pill",href:$e.login,children:"Login"}),
-    o.jsx(rt,{children:"Get Flow free"}),
+    o.jsx(FlowPrimaryCTA,{location:"navigation"}),
     o.jsx("button",{type:"button",className:"menu-button runable-menu","aria-expanded":open,"aria-controls":"mobile-menu","aria-label":open?"Close navigation":"Open navigation",onClick:()=>setOpen(value=>!value),children:open?o.jsx(Sd,{size:21}):o.jsx(jd,{size:21})})
    ]})
   ]}),
-  open&&o.jsxs("nav",{id:"mobile-menu","aria-label":"Mobile navigation",className:"mobile-navigation runable-mobile-nav",children:[
-   o.jsx("a",{href:"#dictation-demo",onClick:()=>setOpen(false),children:"See Flow in action"}),
-   o.jsx("a",{href:"https://runable.com/capabilities",children:"Capabilities"}),
-   o.jsx("a",{href:"https://runable.com/solutions",children:"Solutions"}),
-   o.jsx("a",{href:"https://runable.com/resources",children:"Resources"}),
-   o.jsx("a",{href:"https://runable.com/community",children:"Community"}),
-   o.jsx("a",{href:$e.pricing,children:"Pricing"}),
-   o.jsx("a",{href:$e.login,children:"Login"})
+  open&&o.jsxs("nav",{ref:menu,id:"mobile-menu","aria-label":"Mobile navigation",className:"mobile-navigation runable-mobile-nav",children:[
+   o.jsx("span",{className:"mobile-nav-label",children:"FLOW BY RUNABLE"}),
+   links.map(([label,href],index)=>o.jsxs("a",{href,onClick:()=>setOpen(false),children:[o.jsx("span",{children:`0${index+1}`}),label]},label)),
+   o.jsx(FlowPrimaryCTA,{location:"mobile_navigation"}),
+   o.jsx("a",{href:$e.login,className:"mobile-login",children:"Already use Runable? Log in"})
   ]})
  ]})
 }
@@ -66,21 +64,5 @@ function Iv({progress:t,reduced:s}){
 
 function fA(){
  const ref=M.useRef(null),{scrollYProgress}=Fn({target:ref,offset:["start 88px","end end"]});
- M.useEffect(()=>{
-  const node=ref.current;if(!node)return;
-  let timer=0,lockUntil=0;
-  const settle=()=>{
-   if(Date.now()<lockUntil)return;
-   const progress=scrollYProgress.get();if(progress<=.06||progress>=.96)return;
-   const stops=[.12,.49,.87],target=stops.reduce((best,value)=>Math.abs(value-progress)<Math.abs(best-progress)?value:best,stops[0]);
-   if(Math.abs(target-progress)<.012)return;
-   const top=node.getBoundingClientRect().top+window.scrollY,start=top-88,range=Math.max(1,node.offsetHeight-window.innerHeight+88);
-   lockUntil=Date.now()+900;window.scrollTo({top:start+target*range,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
-  };
-  const queue=()=>{if(Date.now()<lockUntil)return;clearTimeout(timer);timer=window.setTimeout(settle,220)};
-  window.addEventListener('scroll',queue,{passive:true});
-  window.addEventListener('scrollend',settle,{passive:true});
-  return()=>{window.removeEventListener('scroll',queue);window.removeEventListener('scrollend',settle);clearTimeout(timer)};
- },[scrollYProgress]);
  return o.jsx("div",{className:"fb-voice-track premium-voice-track",ref,children:o.jsx("div",{className:"fb-voice-sticky",children:o.jsx(Iv,{progress:scrollYProgress,reduced:!1})})})
 }

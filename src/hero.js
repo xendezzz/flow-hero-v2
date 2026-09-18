@@ -1,11 +1,11 @@
 function FnHoldCue(){
  const samples=[
-  'You’re looking beautiful today. Yes, you.',
-  'Looks like you need to work faster. Flow can help.',
-  'Plot twist: that email just wrote itself.',
-  'Your keyboard misses you. Flow doesn’t.',
+  'Hi Sarah, are you free for lunch tomorrow?',
+  'Let’s move the meeting to one.',
+  'Send the updated plan by Thursday.',
+  'That long email just wrote itself.',
   'Big idea. Zero typing. Excellent choice.',
-  'Careful. This might become your new superpower.'
+  'Your thought is now ready to send.'
  ];
  const [active,setActive]=M.useState(false),[visible,setVisible]=M.useState(false),[text,setText]=M.useState('');
  const control=M.useRef(null),typing=M.useRef(0),dismiss=M.useRef(0),tap=M.useRef(0),last=M.useRef(-1);
@@ -36,11 +36,13 @@ function FlowHeadline(){
  },[reduced]);
  M.useEffect(()=>{
    const sections=[...document.querySelectorAll('.fb-free,.fb-closing')];
+   const observers=[];
    const fields=sections.map(section=>{
-     const field=document.createElement('video');field.className='section-dither-field';field.src='/assets/hero-gradient-loop.mp4?v=supplied-dither';field.autoplay=true;field.muted=true;field.loop=true;field.playsInline=true;field.setAttribute('aria-hidden','true');section.prepend(field);
+     const field=document.createElement('video');field.className='section-dither-field';field.src='/assets/hero-gradient-loop.mp4?v=conversion';field.autoplay=false;field.preload='none';field.muted=true;field.loop=true;field.playsInline=true;field.setAttribute('aria-hidden','true');section.prepend(field);
+     const observer=new IntersectionObserver(entries=>entries.forEach(entry=>entry.isIntersecting?field.play().catch(()=>{}):field.pause()),{rootMargin:'240px'});observer.observe(section);observers.push(observer);
      return field;
    });
-   return()=>fields.forEach(field=>field.remove());
+   return()=>{observers.forEach(observer=>observer.disconnect());fields.forEach(field=>{field.pause();field.remove()})};
  },[reduced]);
  const start=async(expanded=open)=>{
    const el=video.current;if(!el||!source)return;const request=++attempt.current;
@@ -66,11 +68,11 @@ function FlowHeadline(){
    o.jsx('span',{children:'Start'}),
    o.jsx('span',{className:'flow-film'+(open?' is-open':''),onPointerEnter:expand,onPointerLeave:leave,onFocus:expand,onBlur:e=>{if(!e.currentTarget.contains(e.relatedTarget))collapse()},onKeyDown:e=>{if(e.key==='Escape'){e.preventDefault();e.currentTarget.querySelector('.flow-video-trigger')?.focus();collapse()}},children:
      o.jsxs('span',{ref:shell,className:'flow-player'+(open?' is-open':''),onPointerMove:tilt,children:[
-       o.jsx('video',{src:'/assets/figma-flow/thermal-pill.mp4',className:'flow-film-color flow-thermal-asset',autoPlay:true,muted:true,loop:true,playsInline:true,preload:'auto','aria-hidden':true}),
-       o.jsx('img',{src:'/assets/figma-flow/video-poster.png',alt:'Flow video preview',className:'flow-film-image'}),
+       o.jsx('video',{src:'/assets/figma-flow/thermal-pill.mp4',className:'flow-film-color flow-thermal-asset',autoPlay:true,muted:true,loop:true,playsInline:true,preload:'metadata','aria-hidden':true}),
+       o.jsx('img',{src:'/assets/figma-flow/video-poster.jpg',alt:'Flow video preview',className:'flow-film-image'}),
        o.jsx('img',{src:'/assets/figma-flow/play-video.svg',alt:'',className:'flow-figma-play','aria-hidden':true}),
-       source&&o.jsx('video',{ref:video,src:source,poster:'/assets/figma-flow/video-poster.png',className:'flow-hero-video',playsInline:true,autoPlay:true,muted:true,loop:true,preload:'auto',onTimeUpdate:e=>setTime(e.currentTarget.currentTime),onLoadedMetadata:e=>setDuration(e.currentTarget.duration),onPlay:()=>setPaused(false),onPause:()=>setPaused(true),'aria-label':'Flow introduction video'}),
-       o.jsx('button',{type:'button',className:'flow-video-trigger','aria-label':open?'Play Flow introduction':'Expand Flow video preview','aria-expanded':open,onClick:()=>{expand();start(true)}}),
+       source&&o.jsx('video',{ref:video,src:source,poster:'/assets/figma-flow/video-poster.jpg',className:'flow-hero-video',playsInline:true,autoPlay:true,muted:true,loop:true,preload:'metadata',onTimeUpdate:e=>setTime(e.currentTarget.currentTime),onLoadedMetadata:e=>setDuration(e.currentTarget.duration),onPlay:()=>setPaused(false),onPause:()=>setPaused(true),'aria-label':'Flow introduction video'}),
+       o.jsx('button',{type:'button',className:'flow-video-trigger','aria-label':open?'Play Flow introduction':'Expand Flow video preview','aria-expanded':open,'data-flow-event':'video_open','data-flow-location':'hero',onClick:()=>{expand();start(true)}}),
        open&&source&&o.jsxs('span',{className:'flow-video-controls',children:[
          o.jsx('button',{type:'button',className:'flow-play-toggle','aria-label':paused?'Play video':'Pause video',onClick:e=>{e.stopPropagation();if(video.current?.paused)start(true);else video.current?.pause()},children:paused?'▶':'Ⅱ'}),
          o.jsx('span',{className:'flow-video-time',children:stamp(time)}),
